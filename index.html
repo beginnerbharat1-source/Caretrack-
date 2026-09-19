@@ -1,455 +1,99 @@
- <!doctype html>
-<html lang="en">
-<head>
-<meta name="google-site-verification" content="ixqUQQKfqssvNr4MTwUbhS2U0HoKE4Uk-S80tvGZkwQ" />
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b7f78">
-<meta name="description" content="CareTrack personal health monitoring dashboard">
-<title>CareTrack — Health Dashboard</title>
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#087f8c"><title>CareTrack</title>
 <style>
-:root{
-  --bg:#f5f9f9;--card:#fff;--ink:#102033;--muted:#6b7b8b;--line:#dfe9e9;
-  --teal:#087f78;--teal-dark:#066c67;--teal-soft:#e8f8f5;--blue:#2d83c7;
-  --pink:#d94e65;--purple:#7354c7;--warn:#b87416;--danger:#c63f45;
-  --nav:#102f40;--shadow:0 8px 28px rgba(17,48,62,.065);--radius:18px
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #087f7840;outline-offset:2px}
-.app{min-height:100vh}
-.sidebar{position:fixed;inset:0 auto 0 0;width:250px;background:linear-gradient(180deg,#102f40,#0b2837);color:#fff;padding:20px 14px;z-index:50;overflow-y:auto}
-.brand{display:flex;align-items:center;gap:12px;padding:4px 9px 28px}
-.brandIcon{width:49px;height:49px;border-radius:15px;background:#0b988d;display:grid;place-items:center;font-size:27px;box-shadow:0 8px 22px #0003}
-.brand strong{display:block;font-size:20px;line-height:1.1}.brand small{display:block;color:#a9bdc6;margin-top:4px;font-size:11px}
-.nav{display:grid;gap:5px}
-.nav button{width:100%;border:0;background:transparent;color:#cbd9df;text-align:left;padding:12px 13px;border-radius:11px;font-weight:700;display:flex;align-items:center;gap:12px;transition:.18s}
-.nav button:hover,.nav button.active{background:linear-gradient(90deg,#087f78,#11687a);color:#fff}
-.nav .ico{width:23px;text-align:center;font-size:18px}
-.private{margin:35px 2px 0;border:1px solid #0b8993;border-radius:14px;background:#073d50;padding:13px;color:#e8ffff;font-size:12px;line-height:1.45}
-.private b{display:block;font-size:13px;margin-bottom:5px}
-.content{margin-left:250px;min-height:100vh}
-.topbar{height:76px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 30px;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)}
-.mobileMenu{display:none;border:0;background:transparent;color:var(--ink);font-size:25px;padding:6px}
-.search{max-width:430px;flex:1;position:relative}
-.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--line);border-radius:12px;background:#f8fbfb;color:var(--ink)}
-.search span{position:absolute;left:14px;top:9px;color:#71818f;font-size:18px}
-.topRight{margin-left:auto;display:flex;align-items:center;gap:15px}
-.live{padding:8px 13px;border-radius:99px;background:#eaf9f2;color:#117b5b;font-weight:800;font-size:12px}
-.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#15996c;margin-right:7px}
-.date{font-size:11px;color:var(--muted);text-align:right}
-.profileMini{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800}
-.avatar{width:38px;height:38px;border-radius:50%;background:#e7eef3;display:grid;place-items:center;font-size:18px}
-main{max-width:1500px;margin:auto;padding:32px 32px 45px}
-.view{display:none}.view.active{display:block}
-.hero{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:18px}
-.eyebrow{color:var(--teal);font-weight:900;letter-spacing:2px;font-size:12px;text-transform:uppercase}
-.hero h1{font-size:42px;line-height:1.08;margin:9px 0 8px;letter-spacing:-1.7px}
-.hero p{margin:0;color:#617184;font-size:17px;line-height:1.55;max-width:780px}
-.primary{border:0;background:var(--teal);color:#fff;padding:12px 17px;border-radius:11px;font-weight:850;box-shadow:0 7px 16px #087f7830;white-space:nowrap}
-.primary:hover{background:var(--teal-dark)}
-.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 12px;border-radius:9px;font-weight:750}
-.notice{border:1px solid #c9eee9;background:#f0fbf9;border-radius:13px;padding:13px 16px;color:#25615d;font-size:13px;line-height:1.45;margin-bottom:20px}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-.metric{padding:18px 19px;min-height:145px}
-.metricTop{display:flex;justify-content:space-between;align-items:center;gap:10px}
-.metricLabel{font-size:11px;font-weight:900;color:#687b8a;letter-spacing:1.2px;text-transform:uppercase}
-.metricIcon{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;font-size:20px;flex:none}
-.green{background:#dff8ef;color:#087f78}.blue{background:#e4f3ff;color:#217db7}.pink{background:#fdecef;color:#d84f61}.purple{background:#f0ecff;color:#7253c5}
-.metricValue{font-size:30px;font-weight:900;margin-top:15px;letter-spacing:-1px}
-.metricValue span{font-size:14px;font-weight:650;color:#738291}
-.metricSub{color:#7a8998;font-size:12px;margin-top:5px}
-.grid2{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:18px;margin-bottom:18px}
-.panel{padding:20px}
-.panelHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px}
-.panelTitle{font-size:18px;font-weight:900}.panelSub{font-size:12px;color:var(--muted);margin-top:4px}
-.range{display:flex;background:#f1f5f6;border:1px solid #dfe7e8;border-radius:10px;padding:3px;gap:2px}
-.range button{border:0;background:transparent;padding:7px 10px;border-radius:8px;color:#687786;font-size:11px;font-weight:850}
-.range button.active{background:#fff;color:var(--teal);box-shadow:0 2px 8px #0000000c}
-.chart{height:280px;width:100%;display:block}
-.checklist{display:grid;gap:5px}
-.check{display:flex;align-items:center;gap:10px;padding:11px 7px;border-bottom:1px solid #edf1f2}
-.check:last-child{border-bottom:0}
-.check input{accent-color:var(--teal);width:17px;height:17px}.check span{font-size:13px;font-weight:650}.check small{margin-left:auto;color:#8a98a5}
-.bottomGrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:18px}
-.tableWrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:12px}
-.table th,.table td{text-align:left;padding:11px 8px;border-bottom:1px solid #edf1f2;white-space:nowrap}
-.table th{color:#738291;font-size:10px;text-transform:uppercase;letter-spacing:.6px}.bpBadge{font-weight:850}
-.med{display:grid;gap:0}.medRow{display:grid;grid-template-columns:1fr 65px 70px 35px;gap:9px;padding:12px 5px;border-bottom:1px solid #edf1f2;align-items:center;font-size:12px}
-.medRow:last-child{border:0}.pill{border-radius:99px;padding:4px 7px;text-align:center;font-size:10px;font-weight:850}
-.taken{background:#e7f7ef;color:#15825d}.due{background:#fff0ee;color:#c84e45}
-.actionGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.action{border:1px solid var(--line);background:#f8fbfb;padding:11px 13px;border-radius:10px;text-align:left;color:var(--ink);font-weight:800}.action.primaryAction{background:var(--teal);color:#fff;border-color:var(--teal)}
-.formCard{max-width:980px;margin:auto}.formGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.field label{display:block;font-size:12px;color:#687b8a;font-weight:850;margin-bottom:6px}
-.field input,.field textarea,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;outline:0;background:#fff;color:var(--ink)}
-.field textarea{min-height:100px;resize:vertical}.formActions{margin-top:15px;display:flex;gap:8px;flex-wrap:wrap}
-.empty{padding:30px;text-align:center;color:var(--muted)}
-.pageTitle{font-size:28px;margin:7px 0 20px}
-.settingsGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-footer{color:#778794;font-size:11px;text-align:center;margin-top:24px;line-height:1.5}
-.overlay{display:none}
-.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#102f40;color:#fff;padding:11px 15px;border-radius:10px;font-size:13px;font-weight:750;z-index:100;transition:.2s;box-shadow:0 8px 24px #0003}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.dangerText{color:var(--danger);font-weight:800}.warningText{color:var(--warn);font-weight:800}
-@media(max-width:1050px){
-  .sidebar{width:215px}.content{margin-left:215px}.metrics{grid-template-columns:repeat(2,1fr)}.grid2,.bottomGrid{grid-template-columns:1fr}.hero h1{font-size:36px}
-}
-@media(max-width:720px){
-  .sidebar{width:min(310px,88vw);transform:translateX(-105%);transition:transform .22s ease;display:block;box-shadow:12px 0 35px #0004}
-  .sidebar.open{transform:translateX(0)}
-  .content{margin-left:0;width:100%}
-  .overlay{position:fixed;inset:0;background:#07182080;z-index:40;display:block;opacity:0;pointer-events:none;transition:.2s}
-  .overlay.open{opacity:1;pointer-events:auto}
-  .mobileMenu{display:block}
-  .topbar{height:68px;padding:0 13px;gap:6px}.search{display:none}.live,.date{display:none}.topRight{gap:8px}
-  .profileMini span{display:none}
-  main{padding:22px 14px 35px}
-  .hero{display:block}.hero h1{font-size:32px;letter-spacing:-1.2px}.hero p{font-size:15px}.hero .primary{margin-top:16px}
-  .metrics{grid-template-columns:1fr 1fr;gap:9px}.metric{padding:14px;min-height:132px}.metricLabel{font-size:10px}.metricValue{font-size:23px}.metricIcon{width:35px;height:35px}
-  .grid2,.bottomGrid{gap:12px}.panel{padding:14px}.chart{height:230px}
-  .actionGrid{grid-template-columns:1fr 1fr}.formGrid,.settingsGrid{grid-template-columns:1fr}
-  .medRow{grid-template-columns:1fr 55px 62px 30px}
-}
-@media(max-width:390px){.metrics{grid-template-columns:1fr}.hero h1{font-size:29px}.range button{padding:6px 8px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+:root{--bg:#f3f8fa;--card:#fff;--ink:#17324d;--muted:#687b8a;--line:#dce7ed;--p:#087f8c;--p2:#0c9b86;--ok:#16845b;--warn:#b66a16;--bad:#c43e3e;--shadow:0 8px 26px #17324d12}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
+header{background:linear-gradient(135deg,#076c88,#0c9b86);color:#fff;padding:18px 16px 34px}.bar,main,footer{max-width:1100px;margin:auto}.bar{display:flex;justify-content:space-between;align-items:center}.brand{font-size:23px;font-weight:850}.tag{font-size:12px;opacity:.9}.lang{padding:9px;border-radius:10px;border:1px solid #fff5;background:#fff1;color:#fff}
+main{margin-top:-18px;padding:0 15px 45px}.hero,.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.hero{padding:20px;margin-bottom:14px}.hero h1{margin:0 0 5px;font-size:28px}.muted{color:var(--muted);font-size:13px}
+.nav{display:flex;gap:8px;overflow:auto;margin-bottom:14px}.nav button{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:12px;font-weight:750;color:var(--ink);white-space:nowrap}.nav .active,.primary{background:var(--p);color:#fff;border-color:var(--p)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.wide{grid-column:1/-1}.card{padding:17px}.metric{font-size:31px;font-weight:850;margin:10px 0 2px}.pill{display:inline-block;padding:5px 9px;border-radius:99px;background:#eaf5f0;color:var(--ok);font-size:12px;font-weight:750;margin-top:9px}.warn{background:#fff2e2;color:var(--warn)}.bad{background:#fdeaea;color:var(--bad)}
+h2{font-size:18px;margin:0 0 9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}button{font:inherit;cursor:pointer}.primary,.secondary{padding:10px 14px;border-radius:10px;font-weight:750}.secondary{border:1px solid var(--line);background:#f7fafb;color:var(--ink)}
+form{display:grid;gap:10px}.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}label{display:block;font-size:12px;color:var(--muted);font-weight:750;margin-bottom:5px}input,textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;color:var(--ink)}
+canvas{width:100%;height:210px;border:1px solid var(--line);border-radius:12px;background:#fbfdfe}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted)}
+.notice{margin-top:12px;padding:12px;border-radius:12px;background:#fff5e6;border:1px solid #f0d2a3;color:#704d22;font-size:13px}.hidden{display:none!important}.check{padding:7px 0}.check input{width:auto;margin-right:8px}
+footer{padding:0 15px 35px;color:var(--muted);font-size:12px}@media(max-width:800px){.grid,.formgrid{grid-template-columns:1fr}.wide{grid-column:auto}.bar{align-items:flex-start}}
+
+/* V2.1 growth and sharing */
+.growthBar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 18px}
+.growthCard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 6px 20px rgba(17,48,62,.05)}
+.growthCard b{display:block;font-size:13px;margin:4px 0}.growthCard span{font-size:11px;color:var(--muted)}
+.reportBanner{background:linear-gradient(120deg,#102f40,#087f78);color:#fff;border-radius:16px;padding:18px;margin:0 0 18px;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.reportBanner p{margin:5px 0 0;color:#d8eceb;font-size:12px}.reportBanner .secondary{background:#fff}
+.quickTools{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.quickTool{border:1px solid var(--line);background:#fff;border-radius:12px;padding:13px;text-align:left;font-weight:800}
+.quickTool small{display:block;color:var(--muted);font-weight:500;margin-top:4px}
+.shareBox{background:#f0fbf9;border:1px solid #c9eee9;border-radius:12px;padding:14px;margin-top:12px;font-size:12px}
+@media(max-width:720px){.growthBar{grid-template-columns:1fr 1fr}.quickTools{grid-template-columns:1fr 1fr}.reportBanner{display:block}.reportBanner .secondary{margin-top:10px}}
 </style>
-</head>
-<body>
-<div class="app">
-<aside class="sidebar" id="sidebar">
-  <div class="brand"><div class="brandIcon">♡</div><div><strong>CareTrack</strong><small>Health, Our Priority</small></div></div>
-  <nav class="nav" aria-label="Main navigation">
-    <button class="active" data-view="dashboard"><span class="ico">▣</span>Dashboard</button>
-    <button data-view="record"><span class="ico">＋</span>Log Reading</button>
-    <button data-view="trends"><span class="ico">⌁</span>Trends & Charts</button>
-    <button data-view="meds"><span class="ico">▱</span>Medicine Reminder</button>
-    <button data-view="history"><span class="ico">◷</span>History</button>
-    <button data-view="profile"><span class="ico">♙</span>Profile</button>
-    <button data-view="report"><span class="ico">▤</span>Doctor Report</button>
-    <button data-view="settings"><span class="ico">⚙</span>Settings & Backup</button>
-  </nav>
-  <div class="private"><b>🔒 Private by design</b>Your readings stay in this browser. No account or server is required for this prototype.</div>
-</aside>
+<meta name="description" content="CareTrack — a simple personal health monitoring and record-keeping companion for blood pressure, glucose, medicines and health trends.">
+<meta name="robots" content="index,follow">
+<meta property="og:title" content="CareTrack — Personal Health Monitor">
+<meta property="og:description" content="Track health readings, medicines and trends in one place.">
+<meta name="theme-color" content="#087f78">
+<link rel="manifest" href="manifest.webmanifest">
 
-<div class="overlay" id="overlay" onclick="closeMobile()"></div>
-
-<div class="content">
-<header class="topbar">
-  <button class="mobileMenu" id="menuBtn" aria-label="Open menu" aria-expanded="false" onclick="toggleMobile()">☰</button>
-  <div class="search"><span>⌕</span><input id="search" placeholder="Search readings, notes..." aria-label="Search readings"></div>
-  <div class="topRight">
-    <div class="live">Local mode</div>
-    <div class="date"><b>Today</b><br><span id="today"></span></div>
-    <div class="profileMini"><div class="avatar">👤</div><span id="miniName">Patient</span></div>
-  </div>
-</header>
-
+</head><body>
+<header><div class="bar"><div><div class="brand">♥ CareTrack</div><div class="tag" data-t="tag">Simple chronic-care monitoring</div></div>
+<select id="lang" class="lang"><option value="en">English</option><option value="mr">मराठी</option><option value="hi">हिन्दी</option><option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option></select></div></header>
 <main>
-<section id="dashboard" class="view active">
-  <div class="hero">
-    <div><div class="eyebrow">✦ Clinical overview</div><h1>A clearer view of your health.</h1><p>Monitor blood pressure and glucose, keep a dependable record, follow medicines, and understand your health trends.</p></div>
-    <button class="primary" onclick="showView('record')">＋ Log BP reading</button>
-  </div>
-  <div class="notice">ⓘ This workspace helps you record and organize health information. It does not diagnose or replace medical care.</div>
+<div class="growthBar">
+<div class="growthCard">🔒<b>Private by design</b><span>Current version keeps records in this browser.</span></div>
+<div class="growthCard">📈<b>Understand trends</b><span>See your readings over time.</span></div>
+<div class="growthCard">👨‍⚕️<b>Doctor-ready</b><span>Prepare a concise visit summary.</span></div>
+<div class="growthCard">📱<b>Installable</b><span>Add CareTrack to your phone home screen.</span></div>
+</div>
+<div class="reportBanner"><div><strong>Make your next doctor visit easier.</strong><p>Generate a simple summary of your recent readings and records.</p></div><button class="secondary" onclick="downloadCareTrackReport()">Generate health summary</button></div>
 
-  <div id="alertBox"></div>
+<section class="hero"><h1 data-t="welcome">Your health, in one place</h1><div class="muted" data-t="intro">Track blood pressure, glucose and asthma in simple daily records.</div><div class="actions"><button class="primary" onclick="tab('record')" data-t="add">+ Add reading</button><button class="secondary" onclick="report()" data-t="report">Doctor report</button></div></section>
+<div class="nav"><button class="active" data-tab="home" onclick="tab('home')" data-t="home">Home</button><button data-tab="record" onclick="tab('record')" data-t="record">Record</button><button data-tab="trends" onclick="tab('trends')" data-t="trends">Trends</button><button data-tab="meds" onclick="tab('meds')" data-t="meds">Medicines</button><button data-tab="profile" onclick="tab('profile')" data-t="profile">Profile</button></div>
 
-  <div class="metrics">
-    <div class="card metric"><div class="metricTop"><div class="metricLabel">Latest Blood Pressure</div><div class="metricIcon green">♥</div></div><div class="metricValue" id="dashBP">— <span>mmHg</span></div><div class="metricSub" id="dashBPDate">No reading yet</div></div>
-    <div class="card metric"><div class="metricTop"><div class="metricLabel">Latest Blood Glucose</div><div class="metricIcon blue">●</div></div><div class="metricValue" id="dashGl">— <span>mg/dL</span></div><div class="metricSub" id="dashGlDate">No reading yet</div></div>
-    <div class="card metric"><div class="metricTop"><div class="metricLabel">Heart Rate</div><div class="metricIcon pink">♥</div></div><div class="metricValue" id="dashHR">— <span>bpm</span></div><div class="metricSub" id="dashHRDate">No reading yet</div></div>
-    <div class="card metric"><div class="metricTop"><div class="metricLabel">Weight</div><div class="metricIcon purple">⚖</div></div><div class="metricValue" id="dashWeight">— <span>kg</span></div><div class="metricSub" id="dashWeightDate">No reading yet</div></div>
-  </div>
+<section id="home" class="view"><div class="grid">
+<div class="card"><h2>🩸 <span data-t="bp">Blood pressure</span></h2><div id="bp" class="metric">—</div><div class="muted">mmHg</div><div id="bps" class="pill">No reading</div></div>
+<div class="card"><h2>🧪 <span data-t="glucose">Blood glucose</span></h2><div id="gl" class="metric">—</div><div class="muted">mg/dL</div><div id="gls" class="pill">No reading</div></div>
+<div class="card"><h2>🌬️ <span data-t="asthma">Asthma</span></h2><div id="pk" class="metric">—</div><div class="muted">Peak flow L/min</div><div id="pks" class="pill">No reading</div></div>
+<div class="card wide"><h2 data-t="check">Today's checklist</h2><div class="check">☐ <span data-t="m1">Medicines taken as prescribed</span></div><div class="check">☐ <span data-t="m2">BP checked if scheduled</span></div><div class="check">☐ <span data-t="m3">Glucose checked if scheduled</span></div><div class="check">☐ <span data-t="m4">Asthma symptoms/peak flow checked</span></div></div>
+<div class="card wide"><h2 data-t="safetyTitle">Safety</h2><div class="notice" data-t="safety">Tracking only — not a diagnosis. Follow your clinician's action plan. Severe breathlessness, chest pain, fainting, confusion or another emergency requires urgent medical care.</div></div>
+</div></section>
 
-  <div class="grid2">
-    <div class="card panel">
-      <div class="panelHead"><div><div class="panelTitle">Blood Pressure Trend</div><div class="panelSub">Systolic / diastolic (mmHg)</div></div><div class="range" id="bpRange"><button class="active" data-days="7">7D</button><button data-days="14">14D</button><button data-days="30">30D</button><button data-days="90">90D</button></div></div>
-      <canvas class="chart" id="bpChart" aria-label="Blood pressure trend chart"></canvas>
-    </div>
-    <div class="card panel">
-      <div class="panelHead"><div><div class="panelTitle">Today's Checklist</div><div class="panelSub">Keep your daily care routine on track</div></div></div>
-      <div class="checklist">
-        <label class="check"><input type="checkbox" data-check="med"><span>Medicines taken</span></label>
-        <label class="check"><input type="checkbox" data-check="bp"><span>BP checked</span></label>
-        <label class="check"><input type="checkbox" data-check="gl"><span>Glucose checked</span></label>
-        <label class="check"><input type="checkbox" data-check="weight"><span>Weight updated</span></label>
-        <label class="check"><input type="checkbox" data-check="note"><span>Add a note</span></label>
-      </div>
-    </div>
-  </div>
+<section id="record" class="view hidden"><div class="card"><h2 data-t="recordTitle">Record health data</h2><form id="readingForm"><div class="formgrid"><div><label>Date & time</label><input id="dt" type="datetime-local" required></div><div><label>BP systolic</label><input id="sys" type="number" placeholder="128"></div><div><label>BP diastolic</label><input id="dia" type="number" placeholder="78"></div><div><label>Glucose mg/dL</label><input id="glu" type="number" placeholder="110"></div><div><label>Peak flow L/min</label><input id="peak" type="number" placeholder="420"></div><div><label>Asthma symptoms 0–3</label><input id="sym" type="number" min="0" max="3" placeholder="0"></div></div><button class="primary" data-t="save">Save reading</button></form><div class="notice">Use clinician-provided targets and action plans. This app must not independently change medication doses.</div></div></section>
 
-  <div class="bottomGrid">
-    <div class="card panel"><div class="panelHead"><div><div class="panelTitle">Recent Readings</div><div class="panelSub">Your latest health measurements</div></div><button class="secondary" onclick="showView('history')">View all ›</button></div><div class="tableWrap"><table class="table"><thead><tr><th>Date & Time</th><th>BP</th><th>Glucose</th><th>Heart Rate</th><th>Weight</th></tr></thead><tbody id="recentRows"></tbody></table></div></div>
-    <div class="card panel"><div class="panelHead"><div><div class="panelTitle">Medicine Reminder</div><div class="panelSub">Today's medication schedule</div></div><button class="secondary" onclick="showView('meds')">＋ Add</button></div><div class="med" id="dashMeds"></div></div>
-  </div>
+<section id="trends" class="view hidden"><div class="grid"><div class="card wide"><h2>Blood pressure trend</h2><canvas id="bpChart"></canvas></div><div class="card wide"><h2>Glucose trend</h2><canvas id="glChart"></canvas></div><div class="card wide"><h2 data-t="history">Recent readings</h2><div style="overflow:auto"><table><thead><tr><th>Date</th><th>BP</th><th>Glucose</th><th>Peak flow</th><th>Symptoms</th></tr></thead><tbody id="rows"></tbody></table></div></div></div></section>
 
-  <div class="card panel" style="margin-top:18px"><div class="panelHead"><div><div class="panelTitle">Quick Actions</div><div class="panelSub">Common tasks</div></div></div><div class="actionGrid"><button class="action primaryAction" onclick="showView('record')">＋ Log BP Reading</button><button class="action" onclick="showView('record');setTimeout(()=>document.getElementById('glucose').focus(),50)">＋ Log Glucose</button><button class="action" onclick="showView('meds')">＋ Add Medicine</button><button class="action" onclick="showView('report')">▤ Doctor Report</button></div></div>
+<section id="meds" class="view hidden"><div class="card"><h2 data-t="medTitle">Medicine reminders</h2><form id="medForm"><div class="formgrid"><div><label>Medicine</label><input id="mn" placeholder="e.g. Amlodipine"></div><div><label>Dose</label><input id="md" placeholder="e.g. 5 mg"></div><div><label>Time</label><input id="mt" type="time"></div></div><button class="primary" data-t="addMed">Add reminder</button></form><div id="medList"></div></div></section>
+
+<section id="profile" class="view hidden"><div class="card"><h2>Patient profile</h2><form id="profileForm"><div class="formgrid"><div><label>Name</label><input id="name"></div><div><label>Age</label><input id="age" type="number"></div><div><label>Emergency contact</label><input id="contact"></div><div><label>Clinician BP target</label><input id="targetbp" placeholder="e.g. 130/80"></div><div><label>Glucose instructions</label><input id="targetgl"></div><div><label>Personal asthma plan</label><textarea id="aplan"></textarea></div></div><button class="primary">Save profile</button></form></div></section>
+
+<section class="card panel" style="margin-top:18px">
+<div class="panelHead"><div><div class="panelTitle">Quick tools</div><div class="panelSub">Useful actions without leaving your dashboard</div></div></div>
+<div class="quickTools">
+<button class="quickTool" onclick="showView('record')">＋ Record reading<small>Add a new health reading.</small></button>
+<button class="quickTool" onclick="downloadCareTrackReport()">▤ Doctor summary<small>Create a local health summary.</small></button>
+<button class="quickTool" onclick="window.print()">🖨 Print page<small>Print the current CareTrack view.</small></button>
+<button class="quickTool" onclick="shareCareTrack()">↗ Share CareTrack<small>Share the website, not private data.</small></button>
+</div>
+<div class="shareBox"><b>Safety & privacy</b><br><span>CareTrack is a record-keeping tool, not a diagnostic or emergency service. The current GitHub Pages version stores entries locally in this browser. Avoid entering real patient information until secure clinical infrastructure is implemented.</span></div>
 </section>
-
-<section id="record" class="view"><div class="card panel formCard"><div class="eyebrow">Health record</div><h2 class="pageTitle">Log a new reading</h2><p class="panelSub" style="font-size:14px;margin-bottom:20px">Enter any measurements you have. At least one value is required.</p><form id="readingForm"><div class="formGrid">
-<div class="field"><label for="dt">Date & time</label><input id="dt" type="datetime-local" required></div>
-<div class="field"><label for="sys">BP systolic (mmHg)</label><input id="sys" type="number" min="50" max="300" placeholder="128"></div>
-<div class="field"><label for="dia">BP diastolic (mmHg)</label><input id="dia" type="number" min="30" max="200" placeholder="82"></div>
-<div class="field"><label for="glucose">Blood glucose (mg/dL)</label><input id="glucose" type="number" min="20" max="800" placeholder="110"></div>
-<div class="field"><label for="hr">Heart rate (bpm)</label><input id="hr" type="number" min="20" max="250" placeholder="72"></div>
-<div class="field"><label for="weight">Weight (kg)</label><input id="weight" type="number" step="0.1" min="1" max="500" placeholder="74.0"></div>
-<div class="field" style="grid-column:1/-1"><label for="note">Note</label><textarea id="note" placeholder="Optional context — e.g. fasting, after exercise, after lunch..."></textarea></div>
-</div><div class="formActions"><button class="primary">Save reading</button><button type="button" class="secondary" onclick="showView('dashboard')">Cancel</button></div></form></div></section>
-
-<section id="trends" class="view"><div class="card panel"><div class="eyebrow">Analytics</div><h2 class="pageTitle">Health trends</h2><div class="grid2"><div class="card panel"><div class="panelTitle">Blood Pressure</div><canvas class="chart" id="bpChart2"></canvas></div><div class="card panel"><div class="panelTitle">Blood Glucose</div><canvas class="chart" id="glChart"></canvas></div></div></div></section>
-
-<section id="history" class="view"><div class="card panel"><div class="eyebrow">History</div><h2 class="pageTitle">All readings</h2><div class="tableWrap"><table class="table"><thead><tr><th>Date & Time</th><th>BP</th><th>Glucose</th><th>Heart Rate</th><th>Weight</th><th>Note</th></tr></thead><tbody id="historyRows"></tbody></table></div></div></section>
-
-<section id="meds" class="view"><div class="card panel formCard"><div class="eyebrow">Medication</div><h2 class="pageTitle">Medicine reminders</h2><form id="medForm"><div class="formGrid"><div class="field"><label for="mn">Medicine</label><input id="mn" placeholder="e.g. Amlodipine"></div><div class="field"><label for="md">Dose</label><input id="md" placeholder="e.g. 5 mg"></div><div class="field"><label for="mt">Time</label><input id="mt" type="time"></div></div><div class="formActions"><button class="primary">Add reminder</button></div></form><div id="medFull" style="margin-top:20px"></div></div></section>
-
-<section id="profile" class="view"><div class="card panel formCard"><div class="eyebrow">Profile</div><h2 class="pageTitle">Patient profile</h2><form id="profileForm"><div class="formGrid"><div class="field"><label for="name">Name</label><input id="name" autocomplete="name"></div><div class="field"><label for="age">Age</label><input id="age" type="number" min="0" max="120"></div><div class="field"><label for="contact">Emergency contact</label><input id="contact" type="tel"></div><div class="field"><label for="targetbp">Clinician BP target</label><input id="targetbp" placeholder="e.g. 130/80"></div><div class="field"><label for="targetgl">Glucose instructions</label><input id="targetgl"></div><div class="field"><label for="aplan">Care notes</label><textarea id="aplan"></textarea></div></div><div class="formActions"><button class="primary">Save profile</button></div></form></div></section>
-
-<section id="report" class="view"><div class="card panel formCard"><div class="eyebrow">Clinical summary</div><h2 class="pageTitle">Doctor report</h2><p class="panelSub" style="font-size:14px">Generate a simple summary from the information you entered.</p><div class="formActions"><button class="primary" onclick="downloadReport()">▤ Download report</button><button class="secondary" onclick="printReport()">Print</button></div><div class="notice" style="margin-top:20px">This report is generated from user-entered data and should be reviewed by a qualified clinician.</div></div></section>
-
-<section id="settings" class="view"><div class="card panel formCard"><div class="eyebrow">Settings & backup</div><h2 class="pageTitle">Protect your data</h2><p class="panelSub" style="font-size:14px">CareTrack stores information only in this browser. Export a backup before clearing browser data or changing devices.</p><div class="settingsGrid" style="margin-top:20px"><button class="action" onclick="exportBackup()">⬇ Export backup</button><button class="action" onclick="document.getElementById('importFile').click()">⬆ Restore backup</button><button class="action" onclick="downloadCSV()">▤ Export readings CSV</button><button class="action" onclick="clearAllData()">⚠ Clear all data</button></div><input id="importFile" type="file" accept="application/json" hidden><div class="notice" style="margin-top:20px">Important: this GitHub Pages prototype does not provide clinical-grade authentication, encryption, server backups, audit logs, consent workflows, or regulatory controls.</div></div></section>
-
-<footer>CareTrack • Local browser storage • Not a diagnostic or emergency-care service</footer>
-</main>
-</div>
-</div>
-<div class="toast" id="toast"></div>
-
+</main><footer>CareTrack MVP. For production use, real patient data requires secure authentication, encryption, access controls, audit logs, validated clinical rules, consent/privacy workflows and applicable legal/regulatory review.</footer>
 <script>
-const KEY='caretrack_final_v1';
-let state=loadState();
-let rangeDays=7;
-const $=id=>document.getElementById(id);
-
-function loadState(){
-  try{
-    const raw=localStorage.getItem(KEY);
-    if(raw) return normalize(JSON.parse(raw));
-    const old=localStorage.getItem('caretrack_v2');
-    if(old) return normalize(JSON.parse(old));
-  }catch(e){}
-  return {readings:[],meds:[],profile:{},checks:{}};
-}
-function normalize(s){
-  s=s||{};
-  return {
-    readings:Array.isArray(s.readings)?s.readings:[],
-    meds:Array.isArray(s.meds)?s.meds:[],
-    profile:s.profile&&typeof s.profile==='object'?s.profile:{},
-    checks:s.checks&&typeof s.checks==='object'?s.checks:{}
-  };
-}
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(state));
-  render();
-}
-function toast(msg){
-  const t=$('toast');t.textContent=msg;t.classList.add('show');
-  clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),2200);
-}
-function now(){
-  const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());
-  return d.toISOString().slice(0,16);
-}
-function fmt(d){
-  return d?new Date(d).toLocaleString([], {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
-}
-function latest(key){return state.readings.find(r=>r[key]!=null)}
-function closeMobile(){
-  $('sidebar').classList.remove('open');$('overlay').classList.remove('open');
-  $('menuBtn').setAttribute('aria-expanded','false');
-}
-function toggleMobile(){
-  const open=$('sidebar').classList.toggle('open');
-  $('overlay').classList.toggle('open',open);
-  $('menuBtn').setAttribute('aria-expanded',String(open));
-}
-function showView(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  $(id).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
-  closeMobile();
-  if(id==='dashboard'||id==='trends')setTimeout(drawAll,40);
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMobile()});
-$('today').textContent=new Date().toLocaleDateString([], {weekday:'short',day:'2-digit',month:'short',year:'numeric'});
-$('dt').value=now();
-
-$('readingForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const sys=$('sys').value===''?null:Number($('sys').value);
-  const dia=$('dia').value===''?null:Number($('dia').value);
-  if((sys===null)!==(dia===null)){toast('Enter both systolic and diastolic BP.');return}
-  const r={dt:$('dt').value,sys,dia,
-    glucose:$('glucose').value===''?null:Number($('glucose').value),
-    hr:$('hr').value===''?null:Number($('hr').value),
-    weight:$('weight').value===''?null:Number($('weight').value),
-    note:$('note').value.trim()};
-  if(r.sys===null&&r.glucose===null&&r.hr===null&&r.weight===null){toast('Enter at least one measurement.');return}
-  state.readings.unshift(r);state.readings.sort((a,b)=>new Date(b.dt)-new Date(a.dt));
-  save();e.target.reset();$('dt').value=now();toast('Reading saved');showView('dashboard');
-});
-$('medForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const name=$('mn').value.trim();
-  if(!name){toast('Enter a medicine name.');return}
-  state.meds.push({id:Date.now(),name,dose:$('md').value.trim(),time:$('mt').value||''});
-  state.meds.sort((a,b)=>(a.time||'99:99').localeCompare(b.time||'99:99'));
-  save();e.target.reset();toast('Medicine reminder added');
-});
-$('profileForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  state.profile={name:$('name').value.trim(),age:$('age').value,contact:$('contact').value.trim(),targetbp:$('targetbp').value.trim(),targetgl:$('targetgl').value.trim(),aplan:$('aplan').value.trim()};
-  save();toast('Profile saved');
-});
-document.querySelectorAll('[data-check]').forEach(x=>x.addEventListener('change',()=>{
-  state.checks[x.dataset.check]=x.checked;save();
-}));
-document.querySelectorAll('#bpRange button').forEach(b=>b.addEventListener('click',()=>{
-  document.querySelectorAll('#bpRange button').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');rangeDays=Number(b.dataset.days);drawAll();
-}));
-
-function render(){
-  const bp=latest('sys'),gl=latest('glucose'),hr=latest('hr'),wt=latest('weight');
-  $('dashBP').innerHTML=bp?`${bp.sys}/${bp.dia} <span>mmHg</span>`:'— <span>mmHg</span>';
-  $('dashBPDate').textContent=bp?fmt(bp.dt):'No reading yet';
-  $('dashGl').innerHTML=gl?`${gl.glucose} <span>mg/dL</span>`:'— <span>mg/dL</span>';
-  $('dashGlDate').textContent=gl?fmt(gl.dt):'No reading yet';
-  $('dashHR').innerHTML=hr?`${hr.hr} <span>bpm</span>`:'— <span>bpm</span>';
-  $('dashHRDate').textContent=hr?fmt(hr.dt):'No reading yet';
-  $('dashWeight').innerHTML=wt?`${Number(wt.weight).toFixed(1)} <span>kg</span>`:'— <span>kg</span>';
-  $('dashWeightDate').textContent=wt?fmt(wt.dt):'No reading yet';
-  $('miniName').textContent=state.profile.name||'Patient';
-
-  ['name','age','contact','targetbp','targetgl','aplan'].forEach(k=>{
-    if(state.profile[k]!=null)$(k).value=state.profile[k];
-  });
-  document.querySelectorAll('[data-check]').forEach(x=>x.checked=!!state.checks[x.dataset.check]);
-
-  const rows=state.readings.slice(0,8).map(r=>`<tr><td>${fmt(r.dt)}</td><td class="bpBadge">${r.sys!=null&&r.dia!=null?r.sys+'/'+r.dia:'—'}</td><td>${r.glucose??'—'}</td><td>${r.hr??'—'}</td><td>${r.weight??'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">No readings yet. Add your first reading.</td></tr>';
-  $('recentRows').innerHTML=rows;
-  $('historyRows').innerHTML=state.readings.map(r=>`<tr><td>${fmt(r.dt)}</td><td class="bpBadge">${r.sys!=null&&r.dia!=null?r.sys+'/'+r.dia:'—'}</td><td>${r.glucose??'—'}</td><td>${r.hr??'—'}</td><td>${r.weight??'—'}</td><td>${escapeHtml(r.note||'—')}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">No readings saved.</td></tr>';
-
-  const medRows=state.meds.map((m,i)=>`<div class="medRow"><div><b>${escapeHtml(m.name)}</b><br><span style="color:var(--muted)">${escapeHtml(m.dose||'')}</span></div><div>${m.time||'—'}</div><div class="pill taken">Active</div><button aria-label="Delete ${escapeHtml(m.name)}" onclick="removeMed(${i})" style="border:0;background:none;color:#a14;font-size:20px">×</button></div>`).join('')||'<div class="empty">No medicine reminders yet.</div>';
-  $('medFull').innerHTML=medRows;
-  $('dashMeds').innerHTML=state.meds.slice(0,5).map((m,i)=>`<div class="medRow"><div><b>${escapeHtml(m.name)}</b><br><span style="color:var(--muted)">${escapeHtml(m.dose||'')}</span></div><div>${m.time||'—'}</div><div class="pill taken">Active</div><button aria-label="Open medicine list" onclick="showView('meds')" style="border:0;background:none;color:var(--teal);font-size:18px">›</button></div>`).join('')||'<div class="empty">No reminders yet.</div>';
-
-  const alert=bp&&(bp.sys>=180||bp.dia>=120);
-  $('alertBox').innerHTML=alert?'<div class="notice" style="border-color:#f0caca;background:#fff5f5;color:#8e3137">⚠ A blood-pressure reading is at or above 180 systolic or 120 diastolic. Follow your clinician’s plan and seek urgent medical advice, especially if you have concerning symptoms.</div>':'';
-  drawAll();
-}
-function escapeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function removeMed(i){state.meds.splice(i,1);save();toast('Medicine removed')}
-function filteredReadings(key){
-  const cutoff=Date.now()-rangeDays*86400000;
-  return state.readings.filter(r=>r[key]!=null&&new Date(r.dt).getTime()>=cutoff).slice().sort((a,b)=>new Date(a.dt)-new Date(b.dt));
-}
-function drawAll(){
-  drawBP('bpChart');drawBP('bpChart2');drawGl('glChart');
-}
-function setupCanvas(c){
-  if(!c)return null;
-  const w=Math.max(220,c.clientWidth),h=Math.max(190,c.clientHeight),d=devicePixelRatio||1;
-  c.width=w*d;c.height=h*d;
-  const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return [x,w,h];
-}
-function drawBP(id){
-  const c=$(id),s=setupCanvas(c);if(!s)return;
-  const [x,w,h]=s,a=filteredReadings('sys').filter(r=>r.dia!=null);
-  x.clearRect(0,0,w,h);x.font='11px system-ui';x.fillStyle='#738291';
-  if(!a.length){x.fillText('No BP data for this period',20,30);return}
-  const vals=a.flatMap(r=>[r.sys,r.dia]),lo=Math.min(50,Math.min(...vals)-10),hi=Math.max(160,Math.max(...vals)+10),left=38,right=12,top=24,bottom=25;
-  const y=v=>h-bottom-(v-lo)*(h-top-bottom)/(hi-lo),px=i=>left+(a.length===1?0:i*(w-left-right)/(a.length-1));
-  const y80=y(80),y120=y(120);x.fillStyle='#e9f7f3';x.fillRect(left,Math.min(y80,y120),w-left-right,Math.abs(y80-y120));
-  x.strokeStyle='#e8eeee';x.lineWidth=1;
-  for(let i=0;i<5;i++){const yy=top+i*(h-top-bottom)/4;x.beginPath();x.moveTo(left,yy);x.lineTo(w-right,yy);x.stroke();x.fillStyle='#738291';x.fillText(String(Math.round(hi-i*(hi-lo)/4)),4,yy+4)}
-  function series(key,col){
-    x.strokeStyle=col;x.lineWidth=2.5;x.beginPath();
-    a.forEach((r,i)=>i?x.lineTo(px(i),y(r[key])):x.moveTo(px(i),y(r[key])));x.stroke();
-    a.forEach((r,i)=>{x.fillStyle=col;x.beginPath();x.arc(px(i),y(r[key]),3.5,0,Math.PI*2);x.fill()});
-  }
-  series('sys','#087f78');series('dia','#2d83c7');
-  x.fillStyle='#087f78';x.fillText('Systolic',w-105,14);x.fillStyle='#2d83c7';x.fillText('Diastolic',w-53,14);
-}
-function drawGl(id){
-  const c=$(id),s=setupCanvas(c);if(!s)return;
-  const [x,w,h]=s,a=filteredReadings('glucose');x.clearRect(0,0,w,h);x.font='11px system-ui';x.fillStyle='#738291';
-  if(!a.length){x.fillText('No glucose data for this period',20,30);return}
-  const vals=a.map(r=>r.glucose),lo=Math.min(40,Math.min(...vals)-10),hi=Math.max(220,Math.max(...vals)+10),left=35,right=12,top=20,bottom=25;
-  const y=v=>h-bottom-(v-lo)*(h-top-bottom)/(hi-lo),px=i=>left+(a.length===1?0:i*(w-left-right)/(a.length-1));
-  x.strokeStyle='#e8eeee';
-  for(let i=0;i<4;i++){const yy=top+i*(h-top-bottom)/3;x.beginPath();x.moveTo(left,yy);x.lineTo(w-right,yy);x.stroke()}
-  x.strokeStyle='#14835f';x.lineWidth=2.5;x.beginPath();a.forEach((r,i)=>i?x.lineTo(px(i),y(r.glucose)):x.moveTo(px(i),y(r.glucose)));x.stroke();
-  a.forEach((r,i)=>{x.fillStyle='#14835f';x.beginPath();x.arc(px(i),y(r.glucose),3.5,0,Math.PI*2);x.fill()});
-}
-function downloadReport(){
-  const p=state.profile;
-  const txt=`CARETRACK — HEALTH SUMMARY
-Generated: ${new Date().toLocaleString()}
-
-PATIENT
-Name: ${p.name||'Not provided'}
-Age: ${p.age||'Not provided'}
-Emergency contact: ${p.contact||'Not provided'}
-Clinician BP target: ${p.targetbp||'Not provided'}
-Glucose instructions: ${p.targetgl||'Not provided'}
-Care notes: ${p.aplan||'Not provided'}
-
-READINGS
-${state.readings.map(r=>`${fmt(r.dt)} | BP ${r.sys!=null&&r.dia!=null?r.sys+'/'+r.dia:'—'} | Glucose ${r.glucose??'—'} | Heart rate ${r.hr??'—'} | Weight ${r.weight??'—'} | ${r.note||''}`).join('\n')||'No readings'}
-
-MEDICINES
-${state.meds.map(m=>`${m.name} | ${m.dose||''} | ${m.time||''}`).join('\n')||'No medicines recorded'}
-
-Note: This summary is based on user-entered information and is not a diagnosis.`;
-  downloadBlob(txt,'CareTrack-Doctor-Report.txt','text/plain');
-}
-function printReport(){
-  const p=state.profile;
-  const rows=state.readings.map(r=>`<tr><td>${fmt(r.dt)}</td><td>${r.sys!=null&&r.dia!=null?r.sys+'/'+r.dia:'—'}</td><td>${r.glucose??'—'}</td><td>${r.hr??'—'}</td><td>${r.weight??'—'}</td><td>${escapeHtml(r.note||'')}</td></tr>`).join('');
-  const meds=state.meds.map(m=>`<li>${escapeHtml(m.name)} — ${escapeHtml(m.dose||'')} ${m.time?`at ${m.time}`:''}</li>`).join('');
-  const w=window.open('','_blank');
-  if(!w){toast('Allow pop-ups to print the report.');return}
-  w.document.write(`<html><head><title>CareTrack Report</title><style>body{font-family:Arial,sans-serif;color:#102033;padding:30px}h1{color:#087f78}table{border-collapse:collapse;width:100%;margin-top:15px}th,td{border:1px solid #ddd;padding:8px;text-align:left;font-size:12px}th{background:#f3f8f8}.note{margin-top:20px;color:#657585;font-size:12px}</style></head><body><h1>CareTrack — Health Summary</h1><p><b>Patient:</b> ${escapeHtml(p.name||'Not provided')} &nbsp; <b>Age:</b> ${escapeHtml(p.age||'Not provided')}</p><p><b>Generated:</b> ${new Date().toLocaleString()}</p><h2>Readings</h2><table><tr><th>Date</th><th>BP</th><th>Glucose</th><th>Heart rate</th><th>Weight</th><th>Note</th></tr>${rows||'<tr><td colspan="6">No readings</td></tr>'}</table><h2>Medicines</h2><ul>${meds||'<li>No medicines recorded</li>'}</ul><p class="note">This summary is generated from user-entered data and is not a diagnosis.</p><script>window.onload=()=>window.print()<\/script></body></html>`);
-  w.document.close();
-}
-function downloadBlob(content,name,type){
-  const a=document.createElement('a');const url=URL.createObjectURL(new Blob([content],{type}));
-  a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
-}
-function exportBackup(){downloadBlob(JSON.stringify(state,null,2),'CareTrack-backup.json','application/json');toast('Backup exported')}
-$('importFile').addEventListener('change',e=>{
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=()=>{
-    try{state=normalize(JSON.parse(reader.result));save();toast('Backup restored')}catch(err){toast('Invalid backup file')}}
-  reader.readAsText(file);e.target.value='';
-});
-function downloadCSV(){
-  const lines=[['Date & Time','Systolic','Diastolic','Glucose mg/dL','Heart rate bpm','Weight kg','Note']];
-  state.readings.forEach(r=>lines.push([fmt(r.dt),r.sys??'',r.dia??'',r.glucose??'',r.hr??'',r.weight??'',r.note||'']));
-  const csv=lines.map(row=>row.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
-  downloadBlob(csv,'CareTrack-readings.csv','text/csv');toast('CSV exported');
-}
-function clearAllData(){
-  if(!confirm('Clear all CareTrack data from this browser? This cannot be undone unless you have an exported backup.'))return;
-  state={readings:[],meds:[],profile:{},checks:{}};save();toast('All local data cleared');showView('dashboard');
-}
-$('search').addEventListener('input',e=>{
-  const q=e.target.value.toLowerCase().trim();
-  document.querySelectorAll('#recentRows tr').forEach(r=>r.style.display=!q||r.textContent.toLowerCase().includes(q)?'':'none');
-});
-window.addEventListener('resize',()=>{
-  if(window.innerWidth>720)closeMobile();
-  if(document.querySelector('#dashboard').classList.contains('active')||document.querySelector('#trends').classList.contains('active'))drawAll();
-});
-render();
-</script>
-</body>
-</html>
+const T={en:{tag:"Simple chronic-care monitoring",welcome:"Your health, in one place",intro:"Track blood pressure, glucose and asthma in simple daily records.",add:"+ Add reading",report:"Doctor report",home:"Home",record:"Record",trends:"Trends",meds:"Medicines",profile:"Profile",bp:"Blood pressure",glucose:"Blood glucose",asthma:"Asthma",check:"Today's checklist",m1:"Medicines taken as prescribed",m2:"BP checked if scheduled",m3:"Glucose checked if scheduled",m4:"Asthma symptoms/peak flow checked",safetyTitle:"Safety",safety:"Tracking only — not a diagnosis. Follow your clinician's action plan. Severe breathlessness, chest pain, fainting, confusion or another emergency requires urgent medical care.",recordTitle:"Record health data",save:"Save reading",history:"Recent readings",medTitle:"Medicine reminders",addMed:"Add reminder"},
+mr:{tag:"दीर्घकालीन आजारांचे सोपे मॉनिटरिंग",welcome:"तुमचे आरोग्य, एकाच ठिकाणी",intro:"ब्लड प्रेशर, ग्लुकोज आणि अस्थमाची सोपी रोजची नोंद ठेवा.",add:"+ रीडिंग जोडा",report:"डॉक्टर रिपोर्ट",home:"मुख्य",record:"नोंद",trends:"ट्रेंड",meds:"औषधे",profile:"प्रोफाइल",bp:"ब्लड प्रेशर",glucose:"ब्लड ग्लुकोज",asthma:"अस्थमा",check:"आजची चेकलिस्ट",m1:"डॉक्टरांनी सांगितल्याप्रमाणे औषधे घेतली",m2:"वेळ असल्यास BP तपासले",m3:"वेळ असल्यास ग्लुकोज तपासले",m4:"अस्थमा लक्षणे/पीक फ्लो तपासले",safetyTitle:"सुरक्षितता",safety:"हे साधन फक्त नोंदीसाठी आहे, निदानासाठी नाही. डॉक्टरांच्या प्लॅनचे पालन करा. तीव्र श्वास लागणे, छातीत दुखणे, बेशुद्धी किंवा गोंधळ असल्यास तातडीची मदत घ्या.",recordTitle:"आरोग्य नोंद",save:"रीडिंग सेव्ह करा",history:"अलीकडील रीडिंग",medTitle:"औषध रिमाइंडर",addMed:"रिमाइंडर जोडा"}};
+for(const x of ["hi","es","fr","ar"])T[x]=T.en;
+let data=[],meds=[];
+const $=x=>document.getElementById(x);
+function now(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+$("dt").value=now();
+async function api(url,opt={}){let r=await fetch(url,{headers:{"Content-Type":"application/json"},...opt});if(!r.ok)throw Error(await r.text());return r.json()}
+async function load(){try{let d=await api("/api/data");data=d.readings||[];meds=d.meds||[];let p=d.profile||{};for(let k of ["name","age","contact","targetbp","targetgl","aplan"])if(p[k]!=null)$(k).value=p[k]}catch(e){data=[];meds=[]}render()}
+function tab(id){document.querySelectorAll(".view").forEach(v=>v.classList.add("hidden"));$(id).classList.remove("hidden");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===id));if(id==="trends")draw()}
+function bpstat(s,d){if(!s)return["No reading",""];if(s>=180||d>=120)return["Very high — urgent medical advice","bad"];if(s>=140||d>=90)return["High — discuss with clinician","warn"];return["Recorded",""]}
+function render(){let x=data[0]||{};$("bp").textContent=x.sys&&x.dia?x.sys+"/"+x.dia:"—";$("gl").textContent=x.glucose||"—";$("pk").textContent=x.peak||"—";let [t,c]=bpstat(x.sys,x.dia);$("bps").textContent=t;$("bps").className="pill "+c;$("gls").textContent=x.glucose?"Recorded":"No reading";$("pks").textContent=x.peak?(x.sym>=3?"Severe symptoms — urgent care":"Recorded"):"No reading";$("pks").className="pill "+(x.sym>=3?"bad":"");$("rows").innerHTML=data.slice(0,30).map(r=>`<tr><td>${new Date(r.dt).toLocaleString()}</td><td>${r.sys&&r.dia?r.sys+"/"+r.dia:"—"}</td><td>${r.glucose||"—"}</td><td>${r.peak||"—"}</td><td>${r.sym??"—"}</td></tr>`).join("")||"<tr><td colspan=5>No readings yet.</td></tr>";$("medList").innerHTML=meds.map(m=>`<div class=card style="margin-top:9px;box-shadow:none"><b>${m.name}</b> — ${m.dose||""} ${m.time||""}</div>`).join("")||"<p class=muted>No reminders yet.</p>"}
+$("readingForm").onsubmit=async e=>{e.preventDefault();let r={dt:$("dt").value,sys:+$("sys").value||null,dia:+$("dia").value||null,glucose:+$("glu").value||null,peak:+$("peak").value||null,sym:$("sym").value===""?null:+$("sym").value};if(!r.sys&&!r.glucose&&!r.peak)return alert("Enter at least one reading.");try{await api("/api/reading",{method:"POST",body:JSON.stringify(r)});e.target.reset();$("dt").value=now();await load();tab("home")}catch(e){alert("Could not save. Start the server and try again.")}};
+$("medForm").onsubmit=async e=>{e.preventDefault();try{await api("/api/med",{method:"POST",body:JSON.stringify({name:$("mn").value,dose:$("md").value,time:$("mt").value})});e.target.reset();await load()}catch(e){alert("Could not save reminder.")}};
+$("profileForm").onsubmit=async e=>{e.preventDefault();let p={name:$("name").value,age:$("age").value,contact:$("contact").value,targetbp:$("targetbp").value,targetgl:$("targetgl").value,aplan:$("aplan").value};await api("/api/profile",{method:"POST",body:JSON.stringify(p)});alert("Profile saved.")};
+function draw(){drawOne("bpChart",data.slice().reverse(),r=>r.sys,"Systolic BP");drawOne("glChart",data.slice().reverse(),r=>r.glucose,"Glucose")}
+function drawOne(id,a,get,label){let c=$(id),ctx=c.getContext("2d"),w=c.clientWidth,h=210,dpr=devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);let p=a.map((r,i)=>[i,get(r)]).filter(x=>x[1]!=null);ctx.clearRect(0,0,w,h);if(!p.length){ctx.fillText("No data yet",20,30);return}let vals=p.map(x=>x[1]),lo=Math.min(...vals),hi=Math.max(...vals);if(lo===hi){lo--;hi++}let pad=25;ctx.strokeStyle="#dce7ed";for(let i=0;i<4;i++){let y=pad+i*(h-2*pad)/3;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(w-pad,y);ctx.stroke()}ctx.strokeStyle="#087f8c";ctx.lineWidth=3;ctx.beginPath();p.forEach((q,i)=>{let x=pad+(p.length===1?0:i*(w-2*pad)/(p.length-1)),y=h-pad-(q[1]-lo)*(h-2*pad)/(hi-lo);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.fillStyle="#17324d";ctx.font="12px system-ui";ctx.fillText(label+" • "+p.length+" readings",pad,16)}
+function report(){let txt="CareTrack doctor summary\nGenerated: "+new Date().toLocaleString()+"\n\n"+data.slice(0,30).map(r=>`${new Date(r.dt).toLocaleString()} | BP ${r.sys&&r.dia?r.sys+"/"+r.dia:"—"} | glucose ${r.glucose||"—"} | peak flow ${r.peak||"—"} | symptoms ${r.sym??"—"}`).join("\n");let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain"}));a.download="caretrack-doctor-report.txt";a.click()}
+$("lang").onchange=e=>{let t=T[e.target.value]||T.en;document.documentElement.dir=e.target.value==="ar"?"rtl":"ltr";document.querySelectorAll("[data-t]").forEach(x=>x.textContent=t[x.dataset.t]||T.en[x.dataset.t]||x.textContent)}
+load();
+</script></body></html>

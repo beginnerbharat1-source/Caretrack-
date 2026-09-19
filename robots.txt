@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://beginnerbharat1-source.github.io/Caretrack-/sitemap.xml

@@ -1,0 +1,11 @@
+{
+  "name": "CareTrack \u2014 Personal Health Monitor",
+  "short_name": "CareTrack",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f9f9",
+  "theme_color": "#087f78",
+  "description": "Personal health monitoring and record-keeping companion.",
+  "scope": "./",
+  "orientation": "portrait-primary"
+}
