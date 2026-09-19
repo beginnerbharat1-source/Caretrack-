@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Simple self-monitoring dashboard for blood pressure, diabetes and asthma.">
+<title>My Health Monitor</title>
+<style>
+:root{--bg:#f5f8fb;--card:#fff;--text:#17324d;--muted:#64748b;--primary:#0b7fab;--green:#16865b;--orange:#d9822b;--red:#c63d3d;--line:#dbe5ed;--shadow:0 8px 24px #17324d12}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#086f96,#0b9b86);color:white;padding:20px 16px 34px}
+.top{max-width:1050px;margin:auto;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.logo{font-weight:800;font-size:22px}.tag{opacity:.9;font-size:13px}
+select,button,input{font:inherit} select{padding:9px 12px;border-radius:10px;border:1px solid #ffffff55;background:#ffffff18;color:inherit}
+main{max-width:1050px;margin:-18px auto 50px;padding:0 16px}.hero{background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+h1{margin:0 0 6px;font-size:28px}.sub{color:var(--muted);margin:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+.card h2{font-size:18px;margin:0 0 4px}.metric{font-size:32px;font-weight:800;margin:10px 0 2px}.small{font-size:13px;color:var(--muted)}
+.status{display:inline-block;margin:10px 0;padding:5px 9px;border-radius:99px;font-size:12px;font-weight:700;background:#e9f5ef;color:var(--green)}
+.status.warn{background:#fff3e5;color:#a85d12}.status.alert{background:#fdeaea;color:var(--red)}
+form{display:grid;gap:10px;margin-top:12px}label{font-size:13px;font-weight:650;color:var(--muted)}input{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:#fff}
+button{border:0;border-radius:10px;padding:10px 14px;background:var(--primary);color:white;font-weight:700;cursor:pointer}button.secondary{background:#e9f2f6;color:var(--text)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.full{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line)}th{color:var(--muted)}
+.alertbox{padding:14px;border-radius:12px;background:#fff5e8;border:1px solid #f1d2a9;margin-top:14px;color:#704b1f}
+footer{max-width:1050px;margin:0 auto 40px;padding:0 16px;color:var(--muted);font-size:12px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.top{align-items:flex-start}.tag{display:none}}
+</style>
+</head>
+<body>
+<header>
+ <div class="top">
+  <div><div class="logo">♥ My Health Monitor</div><div class="tag">Simple self-monitoring for everyday health</div></div>
+  <select id="lang" aria-label="Language">
+   <option value="en">English</option><option value="hi">हिन्दी</option><option value="mr">मराठी</option>
+   <option value="es">Español</option><option value="fr">Français</option><option value="ar">العربية</option>
+  </select>
+ </div>
+</header>
+
+<main>
+<section class="hero">
+ <h1 data-t="title">Your health, in one place</h1>
+ <p class="sub" data-t="subtitle">Record your readings, see patterns, and know when to seek medical help.</p>
+ <div class="actions">
+  <button onclick="document.getElementById('entry').scrollIntoView()" data-t="add">+ Add today's reading</button>
+  <button class="secondary" onclick="exportData()" data-t="export">Export my data</button>
+  <button class="secondary" onclick="clearData()" data-t="clear">Clear saved data</button>
+ </div>
+</section>
+
+<div class="grid">
+ <section class="card">
+  <h2>🩸 <span data-t="bp">Blood Pressure</span></h2>
+  <div id="bpMetric" class="metric">—</div><div class="small">mmHg</div><div id="bpStatus" class="status">No reading yet</div>
+ </section>
+ <section class="card">
+  <h2>🧪 <span data-t="diabetes">Blood Glucose</span></h2>
+  <div id="glucoseMetric" class="metric">—</div><div class="small">mg/dL</div><div id="glucoseStatus" class="status">No reading yet</div>
+ </section>
+ <section class="card">
+  <h2>🌬️ <span data-t="asthma">Asthma</span></h2>
+  <div id="asthmaMetric" class="metric">—</div><div class="small">Peak flow (L/min)</div><div id="asthmaStatus" class="status">No reading yet</div>
+ </section>
+
+ <section class="card full" id="entry">
+  <h2 data-t="record">Record a reading</h2>
+  <form onsubmit="saveReading(event)">
+   <div class="grid">
+    <div><label>Date & time</label><input id="date" type="datetime-local" required></div>
+    <div><label>BP systolic (mmHg)</label><input id="sys" type="number" min="50" max="300" placeholder="e.g. 128"></div>
+    <div><label>BP diastolic (mmHg)</label><input id="dia" type="number" min="30" max="200" placeholder="e.g. 78"></div>
+    <div><label>Glucose (mg/dL)</label><input id="glucose" type="number" min="20" max="1000" placeholder="e.g. 110"></div>
+    <div><label>Peak flow (L/min)</label><input id="peak" type="number" min="20" max="1000" placeholder="e.g. 420"></div>
+    <div><label>Asthma symptoms (0–3)</label><input id="symptoms" type="number" min="0" max="3" placeholder="0 none, 3 severe"></div>
+   </div>
+   <button type="submit" data-t="save">Save reading</button>
+  </form>
+  <div class="alertbox" data-t="safety">This tool is for tracking only. It does not diagnose or replace your doctor. If you have severe symptoms, chest pain, severe breathlessness, confusion, fainting, or another emergency, seek urgent medical care.</div>
+ </section>
+
+ <section class="card full">
+  <h2 data-t="history">Recent readings</h2>
+  <div style="overflow:auto"><table><thead><tr><th>Date</th><th>BP</th><th>Glucose</th><th>Peak flow</th><th>Symptoms</th></tr></thead><tbody id="history"></tbody></table></div>
+ </section>
+</div>
+</main>
+<footer>My Health Monitor — a privacy-friendly prototype. Data is stored only in this browser using local storage; there is no server or account in this free prototype.</footer>
+
+<script>
+const T={
+en:{title:"Your health, in one place",subtitle:"Record your readings, see patterns, and know when to seek medical help.",add:"+ Add today's reading",export:"Export my data",clear:"Clear saved data",bp:"Blood Pressure",diabetes:"Blood Glucose",asthma:"Asthma",record:"Record a reading",save:"Save reading",history:"Recent readings",safety:"This tool is for tracking only. It does not diagnose or replace your doctor. If you have severe symptoms, chest pain, severe breathlessness, confusion, fainting, or another emergency, seek urgent medical care."},
+hi:{title:"आपका स्वास्थ्य, एक जगह",subtitle:"रीडिंग दर्ज करें, बदलाव देखें और जानें कि कब चिकित्सा सहायता लेनी है।",add:"+ आज की रीडिंग जोड़ें",export:"डेटा एक्सपोर्ट करें",clear:"सहेजा डेटा मिटाएँ",bp:"ब्लड प्रेशर",diabetes:"ब्लड ग्लूकोज़",asthma:"अस्थमा",record:"रीडिंग दर्ज करें",save:"रीडिंग सेव करें",history:"हाल की रीडिंग",safety:"यह टूल केवल रिकॉर्ड रखने के लिए है। यह बीमारी का निदान नहीं करता और डॉक्टर का विकल्प नहीं है। गंभीर लक्षण, सीने में दर्द या बहुत सांस फूलने पर तुरंत चिकित्सा सहायता लें।"},
+mr:{title:"तुमचे आरोग्य, एकाच ठिकाणी",subtitle:"रीडिंग नोंदवा, बदल पाहा आणि वैद्यकीय मदत कधी घ्यावी हे जाणून घ्या.",add:"+ आजची रीडिंग जोडा",export:"डेटा एक्सपोर्ट करा",clear:"सेव्ह केलेला डेटा मिटवा",bp:"ब्लड प्रेशर",diabetes:"ब्लड ग्लुकोज",asthma:"अस्थमा",record:"रीडिंग नोंदवा",save:"रीडिंग सेव्ह करा",history:"अलीकडील रीडिंग",safety:"हे साधन फक्त नोंद ठेवण्यासाठी आहे. हे निदान करत नाही आणि डॉक्टरांचा पर्याय नाही. गंभीर लक्षणे, छातीत दुखणे किंवा तीव्र श्वास लागल्यास तातडीने वैद्यकीय मदत घ्या."},
+es:{title:"Tu salud, en un solo lugar",subtitle:"Registra tus mediciones, observa patrones y sabe cuándo buscar ayuda médica.",add:"+ Añadir medición",export:"Exportar datos",clear:"Borrar datos",bp:"Presión arterial",diabetes:"Glucosa",asthma:"Asma",record:"Registrar una medición",save:"Guardar",history:"Mediciones recientes",safety:"Esta herramienta solo sirve para registrar datos. No diagnostica ni sustituye a tu médico. Ante síntomas graves, busca atención urgente."},
+fr:{title:"Votre santé, au même endroit",subtitle:"Enregistrez vos mesures, observez les tendances et sachez quand demander de l'aide.",add:"+ Ajouter une mesure",export:"Exporter mes données",clear:"Effacer les données",bp:"Tension artérielle",diabetes:"Glycémie",asthma:"Asthme",record:"Enregistrer une mesure",save:"Enregistrer",history:"Mesures récentes",safety:"Cet outil sert uniquement au suivi. Il ne pose pas de diagnostic et ne remplace pas votre médecin. En cas de symptômes graves, demandez des soins urgents."},
+ar:{title:"صحتك في مكان واحد",subtitle:"سجّل القياسات، راقب الأنماط، واعرف متى تحتاج إلى مساعدة طبية.",add:"+ إضافة قراءة اليوم",export:"تصدير بياناتي",clear:"مسح البيانات",bp:"ضغط الدم",diabetes:"سكر الدم",asthma:"الربو",record:"تسجيل قراءة",save:"حفظ القراءة",history:"القراءات الأخيرة",safety:"هذه الأداة للتتبع فقط. لا تشخّص الأمراض ولا تحل محل الطبيب. عند الأعراض الشديدة أو ضيق التنفس الشديد أو ألم الصدر، اطلب رعاية طبية عاجلة."}
+};
+let data=JSON.parse(localStorage.getItem("healthMonitor")||"[]");
+function nowLocal(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)}
+document.getElementById("date").value=nowLocal();
+function statusBP(s,d){if(!s)return ["No reading yet",""]; if(s>=180||d>=120)return ["Very high — seek urgent medical advice","alert"]; if(s>=140||d>=90)return ["High — discuss with your clinician","warn"]; return ["Recorded",""]}
+function render(){
+ let x=data[0]||{};
+ document.getElementById("bpMetric").textContent=x.sys&&x.dia?`${x.sys}/${x.dia}`:"—";
+ document.getElementById("glucoseMetric").textContent=x.glucose||"—";
+ document.getElementById("asthmaMetric").textContent=x.peak||"—";
+ let [bt,bc]=statusBP(x.sys,x.dia);let b=document.getElementById("bpStatus");b.textContent=bt;b.className="status "+bc;
+ let g=document.getElementById("glucoseStatus");g.textContent=x.glucose?"Recorded — interpretation depends on timing/individual target":"No reading yet";g.className="status";
+ let a=document.getElementById("asthmaStatus");a.textContent=x.peak?(x.symptoms>=3?"Severe symptoms — seek urgent care":"Recorded — compare with your personal action plan"):"No reading yet";a.className="status "+(x.symptoms>=3?"alert":"");
+ let h=document.getElementById("history");h.innerHTML=data.slice(0,20).map(r=>`<tr><td>${new Date(r.date).toLocaleString()}</td><td>${r.sys&&r.dia?r.sys+"/"+r.dia:"—"}</td><td>${r.glucose||"—"}</td><td>${r.peak||"—"}</td><td>${r.symptoms??"—"}</td></tr>`).join("")||'<tr><td colspan="5">No readings saved yet.</td></tr>';
+}
+function saveReading(e){e.preventDefault();let r={date:document.getElementById("date").value,sys:+document.getElementById("sys").value||null,dia:+document.getElementById("dia").value||null,glucose:+document.getElementById("glucose").value||null,peak:+document.getElementById("peak").value||null,symptoms:document.getElementById("symptoms").value===""?null:+document.getElementById("symptoms").value};if(!r.sys&&!r.glucose&&!r.peak){alert("Please enter at least one health reading.");return}data.unshift(r);data.sort((a,b)=>new Date(b.date)-new Date(a.date));localStorage.setItem("healthMonitor",JSON.stringify(data));render();e.target.reset();document.getElementById("date").value=nowLocal()}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-health-readings.json";a.click();URL.revokeObjectURL(a.href)}
+function clearData(){if(confirm("Delete all readings saved in this browser?")){data=[];localStorage.removeItem("healthMonitor");render()}}
+function setLang(l){let t=T[l]||T.en;document.documentElement.dir=l==="ar"?"rtl":"ltr";document.querySelectorAll("[data-t]").forEach(el=>el.textContent=t[el.dataset.t]||el.textContent)}
+document.getElementById("lang").addEventListener("change",e=>setLang(e.target.value));render();
+</script>
+</body>
+</html>
